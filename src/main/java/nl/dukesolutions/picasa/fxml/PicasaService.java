@@ -1,7 +1,5 @@
 package nl.dukesolutions.picasa.fxml;
 
-import static nl.dukesolutions.picasa.fxml.SettingName.GOOGLE_PASSWORD;
-import static nl.dukesolutions.picasa.fxml.SettingName.GOOGLE_USERNAME;
 
 import com.google.gdata.client.photos.PicasawebService;
 import com.google.gdata.util.AuthenticationException;
@@ -19,20 +17,25 @@ public class PicasaService {
     private PicasawebService picasawebService;
 
     @Autowired
-    private SettingsService settingsService;
+    private OAuth2 auth2;
+    private UserInfo userInfo;
 
     public synchronized PicasawebService getService() throws AuthenticationException {
         if (picasawebService == null) {
+
             picasawebService = new PicasawebService("picasa-uploader-app");
         }
-        picasawebService.setUserCredentials(settingsService.retrieveSetting(GOOGLE_USERNAME),
-                settingsService.retrieveSetting(GOOGLE_PASSWORD));
+
+        picasawebService.setProtocolVersion(PicasawebService.Versions.V3);
+
+        picasawebService.setHeader("Authorization", "Bearer " + userInfo.getToken());
         return picasawebService;
     }
 
     public String getUserName() throws AuthenticationException {
 
-        String username = settingsService.retrieveSetting(GOOGLE_USERNAME);
+        userInfo = auth2.login();
+        String username = userInfo.getEmail();
         if (username.contains("@")) {
             return username.substring(0, username.indexOf('@'));
         }

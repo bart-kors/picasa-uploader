@@ -22,8 +22,6 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.stage.Stage;
 
-import com.google.gdata.util.AuthenticationException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,18 +100,10 @@ public class MainScreenController {
     @FXML
     void initialize() {
 
-        preferencesMenuItem.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                showSettingsDialog();
-            }
-        });
-
         albumList.setItems(names);
 
         getAlbumNamesService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 
-            @Override
             public void handle(WorkerStateEvent t) {
                 List<AlbumItem> list = (List<AlbumItem>) t.getSource().getValue();
                 for (AlbumItem name : list) {
@@ -122,13 +112,11 @@ public class MainScreenController {
             }
         });
         getAlbumNamesService.setOnFailed(new EventHandler<WorkerStateEvent>() {
-            @Override
+
             public void handle(WorkerStateEvent workerStateEvent) {
-                if (workerStateEvent.getSource().getException() instanceof AuthenticationException) {
-                    showSettingsDialog();
-                } else {
+
                     LOGGER.error("getalbums failed", workerStateEvent.getSource().getException());
-                }
+
 
             }
         });
@@ -136,7 +124,7 @@ public class MainScreenController {
         fillAlbumList();
 
         photoUploadService.setOnScheduled(new EventHandler<WorkerStateEvent>() {
-            @Override
+
             public void handle(WorkerStateEvent workerStateEvent) {
                 progressLabel.textProperty().bind(photoUploadService.messageProperty());
                 progressBar.progressProperty().bind(photoUploadService.progressProperty());
@@ -145,7 +133,6 @@ public class MainScreenController {
 
 
         photoUploadService.valueProperty().addListener(new ChangeListener<UploadStatus>() {
-            @Override
             public void changed(ObservableValue<? extends UploadStatus> observableValue, UploadStatus uploadStatus, UploadStatus uploadStatus2) {
                 if (uploadStatus2 != null && uploadStatus2.getImage() != null) {
                     thumbNail.setImage(uploadStatus2.getImage());
@@ -157,7 +144,6 @@ public class MainScreenController {
         });
 
         imageLink.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
             public void handle(ActionEvent e) {
                 hostedService.showDocument(imageLink.getText());
             }
@@ -165,7 +151,6 @@ public class MainScreenController {
 
         photoUploadService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 
-            @Override
             public void handle(WorkerStateEvent t) {
                 LOGGER.info("uploaded {}", t.getSource().getValue());
                 progressBar.progressProperty().unbind();
@@ -178,7 +163,6 @@ public class MainScreenController {
             }
         });
         photoUploadService.setOnFailed(new EventHandler<WorkerStateEvent>() {
-            @Override
             public void handle(WorkerStateEvent workerStateEvent) {
                 LOGGER.error("upload failed", workerStateEvent.getSource().getException());
                 progressBar.progressProperty().unbind();
@@ -197,12 +181,7 @@ public class MainScreenController {
         getAlbumNamesService.start();
     }
 
-    private void showSettingsDialog() {
-        SettingsDialogController msgBox = new SettingsDialogController();
-        msgBox.showMessageBox(primaryStage);
-        fillAlbumList();
 
-    }
 
 
 }

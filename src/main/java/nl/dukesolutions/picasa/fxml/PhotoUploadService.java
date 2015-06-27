@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 import javafx.concurrent.Service;
@@ -16,7 +15,6 @@ import com.amazonaws.event.ProgressListener;
 import com.amazonaws.event.ProgressListenerCallbackExecutor;
 import com.amazonaws.event.ProgressReportingInputStream;
 import com.google.gdata.data.DateTime;
-import com.google.gdata.data.Link;
 import com.google.gdata.data.PlainTextConstruct;
 import com.google.gdata.data.media.MediaStreamSource;
 import com.google.gdata.data.photos.PhotoEntry;
@@ -69,7 +67,6 @@ public class PhotoUploadService extends Service<UploadStatus> {
         protected UploadStatus call() throws Exception {
             URL albumPostUrl = new URL("https://picasaweb.google.com/data/feed/api/user/" + picasaService.getUserName()
                     + "/albumid/" + albumItem.getId());
-            List<Link> linkes = new ArrayList<Link>();
             for (final File file : files) {
                 createThumbNail(file);
 
@@ -101,7 +98,6 @@ public class PhotoUploadService extends Service<UploadStatus> {
 
         private void createThumbNail(final File file) {
             new Thread(new Runnable() {
-                @Override
                 public void run() {
                     InputStream inputStream = null;
                     try {
@@ -133,7 +129,6 @@ public class PhotoUploadService extends Service<UploadStatus> {
             this.uploadTask = uploadTask;
         }
 
-        @Override
         public void progressChanged(ProgressEvent progressEvent) {
             progress += progressEvent.getBytesTransferred();
             uploadTask.updateProgress(progress, length);
